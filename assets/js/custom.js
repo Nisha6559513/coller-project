@@ -1,5 +1,4 @@
-
-  // NAV scroll
+// NAV scroll
   const nav = document.getElementById('main-nav');
   window.addEventListener('scroll', () => {
     nav.classList.toggle('scrolled', window.scrollY > 80);
@@ -28,25 +27,31 @@
       return;
     }
 
-    document.getElementById('enquiry-form-wrap').style.display = 'none';
-    document.getElementById('form-success').style.display = 'block';
+    const lname = document.getElementById('f-lname').value.trim();
+    const phone = document.getElementById('f-phone').value.trim();
+    const message = document.getElementById('f-message').value.trim();
 
-    // Build mailto
-    const msg = document.getElementById('f-message').value;
-    const subject = encodeURIComponent(`Enquiry from ${fname} – ${collection}`);
-    const body = encodeURIComponent(`Name: ${fname} ${document.getElementById('f-lname').value}\nEmail: ${email}\nPhone: ${document.getElementById('f-phone').value}\nCollection: ${collection}\n\nMessage:\n${msg}`);
-    setTimeout(() => {
-      window.location.href = `mailto:hello@maisongarments.com?subject=${subject}&body=${body}`;
-    }, 800);
+    // Send email via Formspree with formatted data
+    const formData = new FormData();
+    formData.append('name', `${fname} ${lname}`);
+    formData.append('email', email);
+    formData.append('phone', phone);
+    formData.append('collection', collection);
+    formData.append('message', message);
+
+    fetch('https://formspree.io/f/xdayprya', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Accept': 'application/json'
+      }
+    })
+    .then(response => {
+      document.getElementById('enquiry-form-wrap').style.display = 'none';
+      document.getElementById('form-success').style.display = 'block';
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error sending enquiry. Please try again.');
+    });
   }
-
-
-  window.addEventListener("scroll", function () {
-    const header = document.querySelector("header");
-
-    if (window.scrollY > 50) {
-      header.classList.add("scrolled");
-    } else {
-      header.classList.remove("scrolled");
-    }
-  });
